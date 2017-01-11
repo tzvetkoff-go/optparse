@@ -1,33 +1,39 @@
 package optparse
 
 import (
+	"os"
 	"fmt"
 	"strings"
 )
 
-// OptionParser structure
+// OptionParser structure structure contains options information
 type OptionParser struct {
 	Options			[]*Option
 }
 
-// Option structure
+// Option structure contains option information
 type Option struct {
 	Long			string
 	Short			rune
 	Value			Value
 }
 
-// Abstract value interface
+// Value interface represents an abstract value type
 type Value interface {
 	Set(string)		error
 }
 
-// Creates a new OptionParser structure
+// New creates a new OptionParser structure
 func New() *OptionParser {
 	return &OptionParser{}
 }
 
-// Parse the command line and return positional arguments
+// Reset resets the list of options
+func (o *OptionParser) Reset() {
+	o.Options = nil
+}
+
+// Parse parses a list of command line arguments and returns positional arguments
 func (o *OptionParser) Parse(args []string) (a []string, e error) {
 	var i int
 
@@ -41,9 +47,9 @@ ArgumentLoop:
 		}
 
 		// Long options
-		if arg[0] == '-' && arg[1] == '-' {
+		if len(arg) > 2 && arg[0] == '-' && arg[1] == '-' {
+			// `--key="value"` style
 			if idx := strings.IndexRune(arg, '='); idx != -1 {
-				// `--key="value"` style
 				key, val := arg[2:idx], arg[idx + 1:]
 
 				for j := 0; j < len(o.Options); j++ {
@@ -63,46 +69,46 @@ ArgumentLoop:
 
 				e = fmt.Errorf("unrecognized option `--%s'", key)
 				return
-			} else {
-				// `--key "value"` style
-				key := arg[2:]
-
-				for j := 0; j < len(o.Options); j++ {
-					opt := o.Options[j]
-
-					if key == opt.Long {
-						// Boolean values have no value, they're always true
-						if _, ok := opt.Value.(BoolValueAssertion); ok {
-							opt.Value.Set("true")
-							continue ArgumentLoop
-						}
-						if _, ok := opt.Value.(BoolListValueAssertion); ok {
-							opt.Value.Set("true")
-							continue ArgumentLoop
-						}
-
-						// Everything else requires a value
-						if i < len(args) - 1 {
-							val := args[i + 1]
-							i++
-
-							e = opt.Value.Set(val)
-							if e != nil {
-								e = fmt.Errorf("invalid value `%s' for option `--%s'", val, key)
-								return
-							}
-
-							continue ArgumentLoop
-						}
-
-						e = fmt.Errorf("option `--%s' requires a value", key)
-						return
-					}
-				}
-
-				e = fmt.Errorf("unrecognized option `--%s'", key)
-				return
 			}
+
+			// `--key "value"` style
+			key := arg[2:]
+
+			for j := 0; j < len(o.Options); j++ {
+				opt := o.Options[j]
+
+				if key == opt.Long {
+					// Boolean values have no value, they're always true
+					if _, ok := opt.Value.(BoolValueAssertion); ok {
+						opt.Value.Set("true")
+						continue ArgumentLoop
+					}
+					if _, ok := opt.Value.(BoolListValueAssertion); ok {
+						opt.Value.Set("true")
+						continue ArgumentLoop
+					}
+
+					// Everything else requires a value
+					if i < len(args) - 1 {
+						val := args[i + 1]
+						i++
+
+						e = opt.Value.Set(val)
+						if e != nil {
+							e = fmt.Errorf("invalid value `%s' for option `--%s'", val, key)
+							return
+						}
+
+						continue ArgumentLoop
+					}
+
+					e = fmt.Errorf("option `--%s' requires a value", key)
+					return
+				}
+			}
+
+			e = fmt.Errorf("unrecognized option `--%s'", key)
+			return
 		}
 
 		// Short options
@@ -171,11 +177,11 @@ ShortLoop:
 	return
 }
 
-// Parse the command line and return positional arguments
-func Parse(args []string) (a []string, e error) {
-	a, e = CommandLine.Parse(args)
+// Parse parses the list of command line arguments (`os.Args[1:]``) and returns positional arguments
+func Parse() (a []string, e error) {
+	a, e = CommandLine.Parse(os.Args[1:])
 	return
 }
 
-// Default OptionParser parser
-var CommandLine *OptionParser = New()
+// CommandLine is the default OptionParser, working with `os.Args[1:]`
+var CommandLine = New()

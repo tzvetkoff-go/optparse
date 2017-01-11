@@ -13,7 +13,7 @@ type test struct {
 	setup		func(o *OptionParser, t *test)
 	args		[]string
 	expected	interface {}
-	error		error
+	err			error
 	result		interface {}
 }
 
@@ -187,13 +187,13 @@ var tests = []test{
 		where:		here(),
 		setup:		func(o *OptionParser, tt *test) { tt.result = o.Bool("bool", 'b', false) },
 		args:		[]string{"-x"},
-		error:		errors.New("unrecognized option `-x'"),
+		err:		errors.New("unrecognized option `-x'"),
 	},
 	{
 		where:		here(),
 		setup:		func(o *OptionParser, tt *test) { tt.result = o.Bool("bool", 'b', false) },
 		args:		[]string{"--unrecognized"},
-		error:		errors.New("unrecognized option `--unrecognized'"),
+		err:		errors.New("unrecognized option `--unrecognized'"),
 	},
 
 	// Invalid value
@@ -201,25 +201,25 @@ var tests = []test{
 		where:		here(),
 		setup:		func(o *OptionParser, tt *test) { tt.result = o.Bool("bool", 'b', false) },
 		args:		[]string{"--bool=not-bool"},
-		error:		errors.New("invalid value `not-bool' for option `--bool'"),
+		err:		errors.New("invalid value `not-bool' for option `--bool'"),
 	},
 	{
 		where:		here(),
 		setup:		func(o *OptionParser, tt *test) { tt.result = o.Bool("int", 'i', false) },
 		args:		[]string{"--int=not-int"},
-		error:		errors.New("invalid value `not-int' for option `--int'"),
+		err:		errors.New("invalid value `not-int' for option `--int'"),
 	},
 	{
 		where:		here(),
 		setup:		func(o *OptionParser, tt *test) { tt.result = o.Bool("uint", 'f', false) },
 		args:		[]string{"--uint=not-uint"},
-		error:		errors.New("invalid value `not-uint' for option `--uint'"),
+		err:		errors.New("invalid value `not-uint' for option `--uint'"),
 	},
 	{
 		where:		here(),
 		setup:		func(o *OptionParser, tt *test) { tt.result = o.Bool("float", 'f', false) },
 		args:		[]string{"--float=not-float"},
-		error:		errors.New("invalid value `not-float' for option `--float'"),
+		err:		errors.New("invalid value `not-float' for option `--float'"),
 	},
 }
 
@@ -230,9 +230,9 @@ func TestOptionParser(t *testing.T) {
 		_, err := o.Parse(tt.args)
 
 		if err != nil {
-			if tt.error != nil {
-				if err.Error() != tt.error.Error() {
-					t.Errorf("%s: got error(%s), expected error(%s)", tt.where, err, tt.error)
+			if tt.err != nil {
+				if err.Error() != tt.err.Error() {
+					t.Errorf("%s: got error(%s), expected error(%s)", tt.where, err, tt.err)
 				}
 
 				continue
@@ -244,33 +244,33 @@ func TestOptionParser(t *testing.T) {
 
 		if r, ok := tt.result.(*bool); ok {
 			if *r != tt.expected {
-				t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+				t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 			}
 		} else if r, ok := tt.result.(*int); ok {
 			if *r != tt.expected {
-				t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+				t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 			}
 		} else if r, ok := tt.result.(*uint); ok {
 			if *r != tt.expected {
-				t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+				t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 			}
 		} else if r, ok := tt.result.(*float64); ok {
 			if *r != tt.expected {
-				t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+				t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 			}
 		} else if r, ok := tt.result.(*string); ok {
 			if *r != tt.expected {
-				t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+				t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 			}
 		} else if r, ok := tt.result.(*[]bool); ok {
 			ev := tt.expected.([]bool)
 			rv := *r
 			if len(rv) != len(ev) {
-				t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+				t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 			} else {
-				for idx, _ := range(*r) {
+				for idx := range *r {
 					if rv[idx] != ev[idx] {
-						t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+						t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 						break
 					}
 				}
@@ -279,57 +279,56 @@ func TestOptionParser(t *testing.T) {
 			ev := tt.expected.([]int)
 			rv := *r
 			if len(rv) != len(ev) {
-				t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+				t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 			} else {
-				for idx, _ := range(*r) {
+				for idx := range *r {
 					if rv[idx] != ev[idx] {
-						t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+						t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 						break
 					}
 				}
 			}
-
 		} else if r, ok := tt.result.(*[]uint); ok {
 			ev := tt.expected.([]uint)
 			rv := *r
 			if len(rv) != len(ev) {
-				t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+				t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 			} else {
-				for idx, _ := range(*r) {
+				for idx := range *r {
 					if rv[idx] != ev[idx] {
-						t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+						t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 						break
 					}
 				}
 			}
-
 		} else if r, ok := tt.result.(*[]float64); ok {
 			ev := tt.expected.([]float64)
 			rv := *r
 			if len(rv) != len(ev) {
-				t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+				t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 			} else {
-				for idx, _ := range(*r) {
+				for idx := range *r {
 					if rv[idx] != ev[idx] {
-						t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+						t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 						break
 					}
 				}
 			}
-
 		} else if r, ok := tt.result.(*[]string); ok {
 			ev := tt.expected.([]string)
 			rv := *r
 			if len(rv) != len(ev) {
-				t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+				t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 			} else {
-				for idx, _ := range(*r) {
+				for idx := range *r {
 					if rv[idx] != ev[idx] {
-						t.Errorf("%s: got %v, expected %v", tt.where, *r, tt.expected)
+						t.Errorf("%s: got %#v, expected %#v", tt.where, *r, tt.expected)
 						break
 					}
 				}
 			}
+		} else {
+			t.Errorf("%s: got unexpected result %#v, expected %#v", tt.where, *r, tt.expected)
 		}
 	}
 }

@@ -62,7 +62,7 @@ func main() {
     pFloatList := optparse.FloatList("float-list", 'F')
     pStringList := optparse.StringList("string-list", 'S')
 
-    args, err := optparse.Parse(os.Args[1:])
+    args, err := optparse.Parse()
 
     if err != nil {
         fmt.Fprintf(os.Stderr, "%s: %s\n\n", os.Args[0], err.Error())
@@ -95,7 +95,7 @@ func main() {
 }
 ```
 
-If you need to parse arguments more than once, you can allocate a `OptionParser` handle instead of using `optparse.CommandLine`:
+If you need to parse arguments more than once, or you want to parse something other than `os.Args[1:]`, you can allocate a `OptionParser` handle instead of using the default `optparse.CommandLine`:
 
 ``` go
 o := optparse.New()
