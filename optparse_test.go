@@ -234,12 +234,11 @@ func TestOptionParser(t *testing.T) {
 				if err.Error() != tt.err.Error() {
 					t.Errorf("%s: got error(%s), expected error(%s)", tt.where, err, tt.err)
 				}
-
-				continue
 			} else {
 				t.Errorf("%s: %s", tt.where, err.Error())
-				continue
 			}
+
+			continue
 		}
 
 		if r, ok := tt.result.(*bool); ok {
