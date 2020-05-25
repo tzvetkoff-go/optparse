@@ -1,26 +1,26 @@
 package optparse
 
 import (
-	"os"
 	"fmt"
+	"os"
 	"strings"
 )
 
-// OptionParser structure structure contains options information
+// OptionParser structure contains options information
 type OptionParser struct {
-	Options			[]*Option
+	Options []*Option
 }
 
 // Option structure contains option information
 type Option struct {
-	Long			string
-	Short			rune
-	Value			Value
+	Long  string
+	Short rune
+	Value Value
 }
 
 // Value interface represents an abstract value type
 type Value interface {
-	Set(string)		error
+	Set(string) error
 }
 
 // New creates a new OptionParser structure
@@ -50,7 +50,7 @@ ArgumentLoop:
 		if len(arg) > 2 && arg[0] == '-' && arg[1] == '-' {
 			// `--key="value"` style
 			if idx := strings.IndexRune(arg, '='); idx != -1 {
-				key, val := arg[2:idx], arg[idx + 1:]
+				key, val := arg[2:idx], arg[idx+1:]
 
 				for j := 0; j < len(o.Options); j++ {
 					opt := o.Options[j]
@@ -89,8 +89,8 @@ ArgumentLoop:
 					}
 
 					// Everything else requires a value
-					if i < len(args) - 1 {
-						val := args[i + 1]
+					if i < len(args)-1 {
+						val := args[i+1]
 						i++
 
 						e = opt.Value.Set(val)
@@ -115,7 +115,7 @@ ArgumentLoop:
 		if arg[0] == '-' {
 			runes := []rune(arg[1:])
 
-ShortLoop:
+		ShortLoop:
 			for ri := 0; ri < len(runes); ri++ {
 				r := runes[ri]
 
@@ -134,23 +134,23 @@ ShortLoop:
 						}
 
 						// Everything else requires a value
-						if ri == len(runes) - 1 {
-							if i >= len(args) - 1 {
+						if ri == len(runes)-1 {
+							if i >= len(args)-1 {
 								e = fmt.Errorf("option `-%c' requires a value", r)
 								return
 							}
 
-							e = opt.Value.Set(args[i + 1])
+							e = opt.Value.Set(args[i+1])
 							if e != nil {
-								e = fmt.Errorf("invalid value `%s' for option `-%c'", args[i + 1], r)
+								e = fmt.Errorf("invalid value `%s' for option `-%c'", args[i+1], r)
 								return
 							}
 
 							i++
 						} else {
-							e = opt.Value.Set(string(runes[ri + 1:]))
+							e = opt.Value.Set(string(runes[ri+1:]))
 							if e != nil {
-								e = fmt.Errorf("invalid value `%s' for option `-%c'", string(runes[ri + 1:]), r)
+								e = fmt.Errorf("invalid value `%s' for option `-%c'", string(runes[ri+1:]), r)
 								return
 							}
 						}
@@ -171,7 +171,7 @@ ShortLoop:
 
 	// Append rest of the arguments
 	if i < len(args) {
-		a = append(a, args[i + 1:]...)
+		a = append(a, args[i+1:]...)
 	}
 
 	return
