@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/go2c/optparse"
+	"github.com/tzvetkoff-go/optparse"
 )
 
 type test struct {

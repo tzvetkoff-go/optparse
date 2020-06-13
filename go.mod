@@ -1,3 +1,3 @@
-module github.com/go2c/optparse
+module github.com/tzvetkoff-go/optparse
 
 go 1.14
