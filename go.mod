@@ -1,3 +1,3 @@
 module github.com/tzvetkoff-go/optparse
 
-go 1.14
+go 1.15
