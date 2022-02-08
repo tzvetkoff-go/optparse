@@ -1,7 +1,6 @@
 # Command line option parsing for Go
 
 [![GoDoc](https://godoc.org/github.com/tzvetkoff-go/optparse?status.svg)](http://godoc.org/github.com/tzvetkoff-go/optparse)
-[![Build Status](https://travis-ci.org/tzvetkoff-go/optparse.svg?branch=master)](https://travis-ci.org/tzvetkoff-go/optparse)
 
 A slightly better CLI option parsing for Go.
 Because [flag](https://golang.org/pkg/flag/) is somewhat crippled.

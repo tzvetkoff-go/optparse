@@ -1,8 +1,0 @@
-language: go
-
-before_install:
-  - go get github.com/mgechev/revive
-
-script:
-  - $HOME/gopath/bin/revive -config revive.toml ./...
-  - go test -v ./...
